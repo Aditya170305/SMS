@@ -1,0 +1,142 @@
+@charset "UTF-8";
+/* ---------- base / sidebar (kept same visual style as your dashboard) ---------- */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: Arial, sans-serif; background:#f5f5f5; color:#222; }
+
+/* main display layout */
+.display { display:flex; gap:10px; align-items:flex-start; }
+
+/* Sidebar (same look) */
+.dashboard {
+  background:#fff;
+  border-radius:15px;
+  height:93vh;
+  width:280px;
+  padding:40px 0;
+  margin-top:40px;
+  margin-left:28px;
+  box-shadow:2px 0 10px rgba(0,0,0,0.1);
+}
+.dashboard ul { list-style:none; padding-left:0; }
+.dashboard ul li {
+  padding:18px 30px;
+  font-weight:500;
+  font-size:16px;
+  color:#333;
+  cursor:pointer;
+  transition:all .25s ease;
+  border-left:4px solid transparent;
+  display:flex; align-items:center; gap:12px;
+}
+.dashboard ul li:hover { background:#f0f8ff; border-left-color:#0066ff; color:#0066ff; }
+.dashboard ul li.active { background:#e8f2ff; border-left-color:#0066ff; color:#0066ff; }
+
+.display img { width:22px; height:22px; }
+
+/* ---------- right content: Academics ---------- */
+.left {
+  border:1px solid rgba(0,0,0,0.08);
+  width:80vw;
+  height:93vh;
+  margin-top:40px;
+  margin-right:28px;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:2px 0 10px rgba(0,0,0,0.08);
+  padding:28px;
+  overflow:auto;
+}
+
+.heading {
+  font-size:24px;
+  font-weight:600;
+  color:#000;
+  margin-bottom:18px;
+}
+
+/* academics card */
+.academics-container { display:flex; gap:20px; }
+.academics-card {
+  flex:1;
+  border-radius:12px;
+  background:#fff;
+  padding:18px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  border:1px solid #e8eefc;
+}
+
+.table-header h2 { font-size:18px; color:#004fcc; margin-bottom:12px; }
+
+/* table style - blue header, white body (matches your image) */
+.academics-table { width:100%; border-collapse:collapse; }
+.academics-table thead th {
+  background:#0066ff; color:#fff; padding:12px 10px; text-align:left; font-weight:600;
+}
+.academics-table tbody td {
+  padding:12px 10px; border-bottom:1px solid #e9f1ff; color:#333; vertical-align:middle;
+}
+.academics-table tbody tr:nth-child(even) { background:#fbfdff; }
+
+/* Buttons in table */
+.btn-view {
+  background:#0066ff;
+  color:#fff;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  font-size:13px;
+  cursor:pointer;
+}
+.btn-view:hover { background:#004fcc; }
+
+/* small label for subject code */
+.subcode { color:#666; font-size:13px; }
+
+/* Notes: place syllabus and notes buttons aligned */
+.academics-table td .cell-wrap { display:flex; align-items:center; gap:8px; }
+
+/* ---------- modal ---------- */
+.modal.hidden { display:none; }
+.modal {
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.45); z-index:1000;
+}
+.modal-content {
+  background:#fff; border-radius:10px; padding:20px;
+  width:70vw; max-width:1200px; max-height:80vh; overflow:auto;
+  box-shadow:0 8px 30px rgba(0,0,0,0.25);
+  position:relative;
+}
+.modal-content.large { width:70%; } /* ensure 70% of viewport width */
+.close {
+  position:absolute; right:16px; top:12px; font-size:26px; cursor:pointer;
+}
+
+/* Assignments table inside modal */
+.assign-table { width:100%; border-collapse:collapse; margin-top:12px; }
+.assign-table th {
+  background:#e8f5ff; color:#003e8a; padding:10px; text-align:left;
+}
+.assign-table td { padding:10px; border-bottom:1px solid #eef7ff; }
+
+/* docContent style (syllabus/notes) */
+.doc-content { padding:12px; background:#fbfdff; border-radius:6px; border:1px solid #e9f6ff; color:#333; line-height:1.5; }
+
+/* small Open button inside modal */
+.btn-open {
+  background:#fff; color:#0066ff; border:1px solid #cfe3ff; padding:6px 10px; border-radius:6px; cursor:pointer;
+}
+.btn-open:hover { background:#f0f8ff; }
+
+/* status badges */
+.badge-present { color:#0b6623; font-weight:600; }
+.badge-missing { color:#b30000; font-weight:600; }
+
+/* responsive tweaks */
+@media (max-width: 900px){
+  .display { flex-direction:column; align-items:stretch; }
+  .dashboard { width:100%; height:auto; display:flex; justify-content:center; padding:12px; border-radius:8px; margin-left:12px; }
+  .left { width:auto; margin-right:12px; padding:16px; }
+  .modal-content { width:92%; }
+}
