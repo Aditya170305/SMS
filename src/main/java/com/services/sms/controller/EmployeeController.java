@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.services.sms.model.Assignment;
 import com.services.sms.model.Student;
+import com.services.sms.model.StudentPerformanceDTO;
 import com.services.sms.model.Subject;
 import com.services.sms.model.TeacherAttendance;
 import com.services.sms.model.TeacherProfile;
@@ -395,10 +396,33 @@ public class EmployeeController {
         return response;
     }
     
+ // ... [Keep existing dependencies and methods] ...
+
+    // Updated Students Page Loading
     @GetMapping("/students")
-    public String students() {
-    	return "Student";
+    public String students(Model m) {
+        // Load Subject and Semesters for the Dropdowns (Same as Attendance)
+        List<String> subjects = teacherAttendanceService.getAllSubjects();
+        List<String> semesters = teacherAttendanceService.getAllSemesters();
+        
+        m.addAttribute("subjects", subjects);
+        m.addAttribute("semesters", semesters);
+        
+        return "Student"; // JSP name
     }
+
+    // New API to fetch student performance table data
+    @GetMapping("/teacher/students/performance")
+    @ResponseBody
+    public List<StudentPerformanceDTO> getStudentPerformance(
+            @RequestParam("subject") String subject,
+            @RequestParam("semester") String semester) {
+        
+        System.out.println("Fetching performance for: " + subject + " | " + semester);
+        return teacherAttendanceService.getStudentPerformance(subject, semester);
+    }
+
+    // ... [Keep logout method] ...
     @GetMapping("/logoutEmployee")
     public String logout() {
     	return "index";

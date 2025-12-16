@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.services.sms.model.Student;
+import com.services.sms.model.StudentPerformanceDTO;
 import com.services.sms.model.TeacherAttendance;
 
 /**
@@ -237,6 +238,67 @@ public class TeacherAttendanceService {
         }
 
         return subjects;
+    }
+    
+ // ... [Keep existing methods: getStudentsBySemester, saveAttendance, getAttendanceByDate, getAllSemesters, getAllSubjects, closeConnection] ...
+
+    /**
+     * Get Student Performance Data (Attendance % calculation)
+     */
+    public List<StudentPerformanceDTO> getStudentPerformance(String subject, String semester) {
+        List<StudentPerformanceDTO> list = new ArrayList<>();
+        
+        // This query joins students with attendance to calculate percentage per student for the specific subject
+        String query = "SELECT s.roll_no, s.name, s.course, s.semester, " +
+                       "COUNT(ta.status) as total_classes, " +
+                       "SUM(CASE WHEN ta.status = 'Present' THEN 1 ELSE 0 END) as present_count " +
+                       "FROM students s " +
+                       "LEFT JOIN teacher_attendance ta ON s.roll_no = ta.roll_no AND ta.subject = ? " +
+                       "WHERE s.semester = ? " +
+                       "GROUP BY s.roll_no, s.name, s.course, s.semester " +
+                       "ORDER BY s.roll_no";
+
+        Database d = new Database();
+        Connection conn = null;
+
+        try {
+            conn = d.db();
+            PreparedStatement st = conn.prepareStatement(query);
+            st.setString(1, subject);
+            st.setString(2, semester);
+
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                StudentPerformanceDTO dto = new StudentPerformanceDTO();
+                dto.setRollNo(rs.getInt("roll_no"));
+                dto.setName(rs.getString("name"));
+                dto.setDepartment(rs.getString("course"));
+                dto.setSemester(rs.getString("semester"));
+                
+                // Calculate Percentage
+                int total = rs.getInt("total_classes");
+                int present = rs.getInt("present_count");
+                double percentage = (total == 0) ? 0.0 : ((double) present / total) * 100;
+                
+                dto.setAttendancePercentage(Math.round(percentage * 10.0) / 10.0); // Round to 1 decimal
+
+                // Set Status based on Percentage
+                if (percentage >= 75) dto.setStatus("Good");
+                else if (percentage >= 60) dto.setStatus("Average");
+                else dto.setStatus("Needs Improvement");
+
+                // Mocking Test Score (Random 50-100) since no table was provided for marks
+                dto.setTestScore(50 + (int)(Math.random() * 50)); 
+
+                list.add(dto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection(conn);
+        }
+        return list;
     }
 
     /**

@@ -1,94 +1,86 @@
-// -------------------------
-// Dummy Student Database
-// -------------------------
-const studentDB = {
-    "CSE": {
-        5: [
-            { roll: "21CSE01", name: "Rahul Sharma", score: 82, att: 91, status: "Good" },
-            { roll: "21CSE02", name: "Priya Sinha", score: 76, att: 85, status: "Average" },
-            { roll: "21CSE03", name: "Aman Verma", score: 64, att: 70, status: "Needs Improvement" }
-        ],
-        4: [
-            { roll: "21CSE11", name: "Suman Das", score: 73, att: 88, status: "Good" }
-        ],
-        3: [
-            { roll: "21CSE21", name: "Rohit Jain", score: 67, att: 78, status: "Average" }
-        ]
-    },
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const applyBtn = document.getElementById("applyBtn");
+    
+    // Add event listener to Apply button
+    applyBtn.addEventListener("click", loadStudents);
 
-    "ECE": {
-        5: [
-            { roll: "21ECE01", name: "Tina Roy", score: 80, att: 90, status: "Good" }
-        ],
-        4: [
-            { roll: "21ECE11", name: "Shiv Kumar", score: 63, att: 72, status: "Average" }
-        ],
-        3: [
-            { roll: "21ECE21", name: "Anjali Singh", score: 59, att: 69, status: "Needs Improvement" }
-        ]
-    },
+    async function loadStudents() {
+        const subject = document.getElementById("subjectSelect").value;
+        const semester = document.getElementById("semesterSelect").value;
+        const tableBody = document.getElementById("tableBody");
 
-    "EE": {
-        5: [
-            { roll: "21EE01", name: "Harsh Patel", score: 77, att: 84, status: "Good" }
-        ],
-        4: [
-            { roll: "21EE11", name: "Mayank Sharma", score: 62, att: 75, status: "Average" }
-        ],
-        3: [
-            { roll: "21EE21", name: "Ravi Verma", score: 55, att: 68, status: "Needs Improvement" }
-        ]
+        // Validation
+        if (!subject || !semester) {
+            alert("Please select both Subject and Semester.");
+            return;
+        }
+
+        // Show loading state
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Loading data...</td></tr>`;
+
+        try {
+            // Fetch data from new Controller Endpoint
+            const response = await fetch(`/teacher/students/performance?subject=${encodeURIComponent(subject)}&semester=${encodeURIComponent(semester)}`);
+            
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            const data = await response.json();
+
+            // Clear table
+            tableBody.innerHTML = "";
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No students found for this selection.</td></tr>`;
+                return;
+            }
+
+            // Populate Table
+            data.forEach(std => {
+                let statusColor = "green";
+                if(std.status === "Average") statusColor = "orange";
+                if(std.status === "Needs Improvement") statusColor = "red";
+
+                const row = `
+                    <tr>
+                        <td>${std.rollNo}</td>
+                        <td>${std.name}</td>
+                        <td>${std.department}</td>
+                        <td>${std.semester}</td>
+                        <td>${std.testScore}</td>
+                        <td>${std.attendancePercentage}%</td>
+                        <td style="color:${statusColor}; font-weight:bold;">${std.status}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+        } catch (error) {
+            console.error("Error:", error);
+            tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error fetching data.</td></tr>`;
+        }
     }
-};
+});
 
 // ----------------------------------------------------
-// Function to Update Table Based on Dropdown Selection
+// Export Table to PDF (Kept from your original code)
 // ----------------------------------------------------
-function loadStudents() {
-    let dept = document.getElementById("department").value;
-    let semText = document.getElementById("semester").value;
-
-    // Extract numeric semester: "5th Semester" → 5
-    let sem = parseInt(semText);
-
-    const tableBody = document.querySelector("#studentTable tbody");
-    tableBody.innerHTML = "";
-
-    if (studentDB[dept] && studentDB[dept][sem]) {
-        studentDB[dept][sem].forEach(std => {
-            tableBody.innerHTML += `
-                <tr>
-                    <td>${std.roll}</td>
-                    <td>${std.name}</td>
-                    <td>${dept}</td>
-                    <td>${sem}</td>
-                    <td>${std.score}</td>
-                    <td>${std.att}%</td>
-                    <td>${std.status}</td>
-                </tr>
-            `;
-        });
-    } else {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align:center; padding:20px;">
-                    No Records Found
-                </td>
-            </tr>
-        `;
-    }
-}
-
-// ----------------------------------------------------
-// Export Table to PDF
-// ----------------------------------------------------
-async function exportPDF() {
+window.exportPDF = async function() {
     const element = document.getElementById("studentTable");
+    // Basic check to ensure table has data
+    if(element.rows.length <= 2) {
+        alert("No data to export");
+        return;
+    }
 
     const canvas = await html2canvas(element);
     const imgData = canvas.toDataURL("image/png");
 
+    const { jsPDF } = window.jspdf; 
     const pdf = new jsPDF("p", "mm", "a4");
+    
     let width = pdf.internal.pageSize.getWidth();
     let height = (canvas.height * width) / canvas.width;
 
@@ -97,12 +89,17 @@ async function exportPDF() {
 }
 
 // ----------------------------------------------------
-// Export Table to Excel (CSV)
+// Export Table to Excel (CSV) (Kept from your original code)
 // ----------------------------------------------------
-function exportExcel() {
+window.exportExcel = function() {
     const table = document.getElementById("studentTable");
-    let csv = "";
+    
+    if(table.rows.length <= 2) { // Header + Loading/Empty row
+        alert("No data to export");
+        return;
+    }
 
+    let csv = "";
     for (let row of table.rows) {
         let rowData = [];
         for (let cell of row.cells) {
@@ -113,18 +110,7 @@ function exportExcel() {
 
     const blob = new Blob([csv], { type: "text/csv" });
     const link = document.createElement("a");
-
     link.href = URL.createObjectURL(blob);
     link.download = "Students_Report.csv";
     link.click();
 }
-
-// ----------------------------------------------------
-// Event Listeners
-// ----------------------------------------------------
-document.querySelector(".apply-btn").addEventListener("click", loadStudents);
-document.querySelector(".pdf-btn").addEventListener("click", exportPDF);
-document.querySelector(".excel-btn").addEventListener("click", exportExcel);
-
-// Load default data (CSE 5th Semester)
-loadStudents();

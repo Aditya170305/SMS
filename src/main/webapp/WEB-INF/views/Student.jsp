@@ -1,53 +1,52 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Students</title>
+<title>Students Records</title>
 <link rel="stylesheet" href="css/StudentStyle.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-	<div class="display">
+    <div class="display">
 
-        <!-- Sidebar -->
         <nav class="dashboard">
             <ul>
-                <li><img src="home.svg"> Dashboard</li>
-                <li><img src="assignment.svg"> Courses</li>
-                <li><img src="attendance.svg"> Attendance</li>
-                <li class="active"><img src="username.svg"> Students</li>
-                <li><img src="user.svg"> Profile</li>
+                <li onclick="location.href='dashboardEmployee'"><img src="images/home.svg"> Dashboard</li>
+                <li onclick="location.href='courses'"><img src="images/assignment.svg"> Courses</li>
+                <li onclick="location.href='attendance1'"><img src="images/attendance.svg"> Attendance</li>
+                <li class="active" onclick="location.href='students'"><img src="images/username.svg"> Students</li>
+                <li onclick="location.href='profile'"><img src="images/user.svg"> Profile</li>
+                <li onclick="location.href='logoutEmployee'"><img src="images/logout.svg">Logout</li>
             </ul>
         </nav>
 
-        <!-- Main Content -->
         <div class="left">
             
             <h1 class="heading">Student Records & Performance</h1>
 
-            <!-- Filters -->
             <div class="filters">
-                <select id="department">
-                    <option value="CSE">CSE</option>
-                    <option value="ECE">ECE</option>
-                    <option value="EE">EE</option>
+                <select id="subjectSelect">
+                    <option value="">-- Select Subject --</option>
+                    <c:forEach var="subject" items="${subjects}">
+                        <option value="${subject}">${subject}</option>
+                    </c:forEach>
                 </select>
 
-                <select id="semester">
-                    <option>5th Semester</option>
-                    <option>4th Semester</option>
-                    <option>3rd Semester</option>
+                <select id="semesterSelect">
+                    <option value="">-- Select Semester --</option>
+                    <c:forEach var="semester" items="${semesters}">
+                        <option value="${semester}">${semester}</option>
+                    </c:forEach>
                 </select>
 
-                <button class="apply-btn">Apply</button>
-                <button class="pdf-btn">Export PDF</button>
-                <button class="excel-btn">Export Excel</button>
+                <button class="apply-btn" id="applyBtn">Apply</button>
+                <button class="pdf-btn" onclick="exportPDF()">Export PDF</button>
+                <button class="excel-btn" onclick="exportExcel()">Export Excel</button>
             </div>
 
-            <!-- Table -->
             <div class="student-card">
                 <table id="studentTable">
                     <thead>
@@ -62,44 +61,18 @@
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody id="tableBody">
                         <tr>
-                            <td>21CSE01</td>
-                            <td>Rahul Sharma</td>
-                            <td>CSE</td>
-                            <td>5</td>
-                            <td>82</td>
-                            <td>91%</td>
-                            <td>Good</td>
-                        </tr>
-                        <tr>
-                            <td>21CSE02</td>
-                            <td>Priya Sinha</td>
-                            <td>CSE</td>
-                            <td>5</td>
-                            <td>76</td>
-                            <td>85%</td>
-                            <td>Average</td>
-                        </tr>
-                        <tr>
-                            <td>21CSE03</td>
-                            <td>Aman Verma</td>
-                            <td>CSE</td>
-                            <td>5</td>
-                            <td>64</td>
-                            <td>70%</td>
-                            <td>Needs Improvement</td>
+                            <td colspan="7" style="text-align:center; color:#888;">
+                                Please select a Subject and Semester and click Apply.
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
-
     </div>
 
     <script src="js/Employee.js"></script>
-    <script type="text/javascript" src="Student.js"></script>
-</body>
-</body>
+    <script src="js/Student.js"></script> </body>
 </html>
