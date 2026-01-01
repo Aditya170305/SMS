@@ -45,9 +45,9 @@
         <div class="left">
             <h1 class="heading">Welcome, Student!</h1>
             <div class="student-info">
-                <p>Student Roll-No : 0187CS231016</p>
-                <p>Batch : 2023-2027</p>
-            </div>
+    			<p>Student Name : ${studentName}</p> 
+    			<p>Enrollment No : ${enrollmentNo}</p>
+    		</div>
             <div class="circular"></div>
 
             <!-- Cards Container -->

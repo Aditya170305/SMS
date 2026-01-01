@@ -64,6 +64,6 @@
         </div>
     </div>
     <script src="js/ClassSchedule.js"></script>
-    <script type="text/javascript" src="js/StudentDashboard.js"></script>p
+    <script type="text/javascript" src="js/StudentDashboard.js"></script>
 </body>
 </html>

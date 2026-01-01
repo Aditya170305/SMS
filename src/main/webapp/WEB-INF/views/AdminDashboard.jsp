@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,24 +8,21 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-	 <div class="display">
-    <!-- Sidebar -->
+    <div class="display">
     <nav class="dashboard">
       <ul>
         <li class="active"><img src="images/home.svg" alt=""> Dashboard</li>
         <li><img width="24px" src="images/book.svg" alt=""> Courses</li>
         <li><img src="images/requests.svg" alt=""> Requests</li>
         <li><img width="24px" src="images/username.svg" alt=""> Users</li>
-        <li><img width="24px" src="images/report.svg" alt=""> Reports</li>
         <li><img src="images/user.svg" alt=""> Profile</li>
+        <li><img src="images/logout.svg" alt="">Logout</li>
       </ul>
     </nav>
 
-    <!-- Main Section -->
     <div class="left">
       <h1 class="heading">Welcome, Admin!</h1>
 
-      <!-- Top Cards -->
       <div class="cards-container">
         <div class="card">
           <h2 class="card-value" id="totalDegrees">5</h2>
@@ -42,9 +38,7 @@
         </div>
       </div>
 
-      <!-- Bottom Section -->
       <div class="bottom-container">
-        <!-- Courses Table -->
         <div class="courses-card">
           <h2>Courses</h2>
           <div class="dropdown-section">
@@ -74,14 +68,12 @@
           </table>
         </div>
 
-        <!-- Chart Section -->
         <div class="chart-card">
-          <h2>Users</h2>
+          <h2>Users Distribution</h2>
           <div class="chart-container">
             <canvas id="userChart"></canvas>
           </div>
 
-          <!-- Line Graph Section -->
           <h2 class="line-title">Total Enrollments Over Time</h2>
           <div class="chart-container">
             <canvas id="enrollmentChart"></canvas>
@@ -92,5 +84,6 @@
   </div>
 
   <script src="js/AdminDashboard.js"></script>
+  <script type="text/javascript" src="js/Admin.js"></script>
 </body>
 </html>

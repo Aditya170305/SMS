@@ -29,7 +29,7 @@
                     <div class="icon-circle">
                         <img class="event2" src="images/username.svg" alt="teacher icon">
                     </div>
-                    Employee
+                    Employe
                 </label>
 
                 <input type="radio" id="student" name="user" value="student">

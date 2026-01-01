@@ -1,148 +1,131 @@
-// Static data with realistic, non-linear user distribution
-const degreeData = {
-  "B.Tech": {
-    branches: [
-      { name: "CSE", students: 120 },
-      { name: "Mechanical", students: 80 },
-      { name: "Electrical", students: 70 },
-      { name: "Civil", students: 60 },
-      { name: "IT", students: 90 },
-    ],
-    // Random realistic bar heights (not increasing)
-    graph: [85, 70, 88, 92],
-    line: [100, 140, 160, 180],
-  },
-  "M.Tech": {
-    branches: [
-      { name: "Computer Science", students: 40 },
-      { name: "Thermal Engineering", students: 30 },
-      { name: "Structural Engineering", students: 25 },
-    ],
-    graph: [45, 38, 50, 47],
-    line: [40, 55, 60, 75],
-  },
-  "Pharmacy": {
-    branches: [
-      { name: "Pharmaceutics", students: 55 },
-      { name: "Pharmacology", students: 50 },
-      { name: "Pharmaceutical Chemistry", students: 45 },
-    ],
-    graph: [70, 65, 72, 68],
-    line: [60, 70, 80, 85],
-  },
-  "MBA": {
-    branches: [
-      { name: "Marketing", students: 70 },
-      { name: "Finance", students: 65 },
-      { name: "HR", students: 60 },
-    ],
-    graph: [88, 75, 84, 90],
-    line: [90, 100, 120, 130],
-  },
-  "BBA": {
-    branches: [
-      { name: "Business Administration", students: 80 },
-      { name: "International Business", students: 40 },
-    ],
-    graph: [78, 64, 82, 76],
-    line: [70, 80, 95, 100],
-  },
-};
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // DOM Elements
+    const degreeSelect = document.getElementById("degreeSelect");
+    const tableBody = document.querySelector("#courseTable tbody");
+    const selectedCourse = document.getElementById("selectedCourse");
+    const totalUsers = document.getElementById("totalUsers");
 
-// DOM elements
-const degreeSelect = document.getElementById("degreeSelect");
-const tableBody = document.querySelector("#courseTable tbody");
-const selectedCourse = document.getElementById("selectedCourse");
-const totalUsers = document.getElementById("totalUsers");
+    // --- 1. Initialize Bar Chart (Semester Distribution) ---
+    const ctxBar = document.getElementById("userChart").getContext("2d");
+    let barChart = new Chart(ctxBar, {
+        type: "bar",
+        data: {
+            labels: ["1st Sem", "2nd Sem", "3rd Sem", "4th Sem", "5th Sem", "6th Sem", "7th Sem", "8th Sem"],
+            datasets: [{
+                data: [0, 0, 0, 0, 0, 0, 0, 0], // Default Empty Data
+                backgroundColor: "#0066FF",
+                borderRadius: 4,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    title: { display: true, text: "No. of Students" },
+                    ticks: { precision: 0 } 
+                },
+                x: { grid: { display: false } },
+            },
+        },
+    });
 
-// Chart.js setup for bar chart (Users per semester)
-const ctxBar = document.getElementById("userChart").getContext("2d");
-const ctxLine = document.getElementById("enrollmentChart").getContext("2d");
+    // --- 2. Initialize Line Chart (Enrollment Trends) ---
+    const ctxLine = document.getElementById("enrollmentChart").getContext("2d");
+    let lineChart = new Chart(ctxLine, {
+        type: "line",
+        data: {
+            labels: ["Q1 (Jan-Mar)", "Q2 (Apr-Jun)", "Q3 (Jul-Sep)", "Q4 (Oct-Dec)"],
+            datasets: [{
+                label: "New Enrollments",
+                data: [0, 0, 0, 0], // Default Empty Data
+                borderColor: "#0066FF",
+                backgroundColor: "rgba(0, 102, 255, 0.2)",
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true,
+                pointRadius: 5,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true } },
+            scales: { 
+                y: { beginAtZero: true, ticks: { precision: 0 } }, 
+                x: { grid: { display: false } } 
+            },
+        },
+    });
 
-let barChart = new Chart(ctxBar, {
-  type: "bar",
-  data: {
-    labels: ["1st Sem", "2nd Sem", "3rd Sem", "4th Sem"],
-    datasets: [{
-      data: [0, 0, 0, 0],
-      backgroundColor: "#0066FF",
-      borderRadius: 4,
-    }],
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: { display: true, text: "No. of Users" },
-        ticks: { stepSize: 20 },
-      },
-      x: { grid: { display: false } },
-    },
-  },
-});
+    // --- 3. Dropdown Change Event Listener ---
+    degreeSelect.addEventListener("change", function () {
+        const selected = this.value;
+        
+        if (!selected) {
+            resetDashboard();
+            return;
+        }
 
-// Chart.js setup for line chart
-let lineChart = new Chart(ctxLine, {
-  type: "line",
-  data: {
-    labels: ["Q1", "Q2", "Q3", "Q4"],
-    datasets: [{
-      label: "Total Enrollments",
-      data: [0, 0, 0, 0],
-      borderColor: "#0066FF",
-      backgroundColor: "rgba(0, 102, 255, 0.2)",
-      borderWidth: 2,
-      tension: 0.3,
-      fill: true,
-      pointRadius: 5,
-    }],
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true }, x: { grid: { display: false } } },
-  },
-});
+        console.log("Fetching data for:", selected);
 
-// Update dashboard dynamically
-degreeSelect.addEventListener("change", function () {
-  const selected = this.value;
-  if (!selected) {
-    tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Select a degree to view data</td></tr>`;
-    selectedCourse.textContent = "—";
-    totalUsers.textContent = "0";
-    barChart.data.datasets[0].data = [0, 0, 0, 0];
-    lineChart.data.datasets[0].data = [0, 0, 0, 0];
-    barChart.update();
-    lineChart.update();
-    return;
-  }
+        // Call Java Controller
+        fetch(`/admin/dashboard/data?degree=${encodeURIComponent(selected)}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            })
+            .then(data => {
+                updateDashboard(selected, data);
+            })
+            .catch(error => {
+                console.error('Error fetching admin data:', error);
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;">Error loading data</td></tr>`;
+            });
+    });
 
-  selectedCourse.textContent = selected;
+    // --- 4. Update UI Function ---
+    function updateDashboard(degree, data) {
+        // Update Cards
+        selectedCourse.textContent = degree;
+        totalUsers.textContent = data.totalUsers;
 
-  const data = degreeData[selected];
-  let total = 0;
-  tableBody.innerHTML = "";
+        // Update Table
+        tableBody.innerHTML = "";
+        if(!data.branchStats || data.branchStats.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No students found for this degree</td></tr>`;
+        } else {
+            data.branchStats.forEach(stat => {
+                const row = `
+                <tr>
+                    <td>${stat.branch}</td>
+                    <td>${stat.count}</td>
+                    <td><span style="color:green;font-weight:bold;">Active</span></td>
+                    <td><a href="#" class="action-link" style="color:#0066FF;text-decoration:none;">View</a></td>
+                </tr>`;
+                tableBody.insertAdjacentHTML("beforeend", row);
+            });
+        }
 
-  data.branches.forEach((b) => {
-    total += b.students;
-    const row = `
-      <tr>
-        <td>${b.name}</td>
-        <td>${b.students}</td>
-        <td>Active</td>
-        <td><a href="#" class="action-link">View</a></td>
-      </tr>`;
-    tableBody.insertAdjacentHTML("beforeend", row);
-  });
+        // Update Charts
+        barChart.data.datasets[0].data = data.semesterCounts;
+        barChart.update();
 
-  totalUsers.textContent = total;
+        lineChart.data.datasets[0].data = data.enrollmentTrends;
+        lineChart.update();
+    }
 
-  // ✅ Update charts dynamically
-  barChart.data.datasets[0].data = data.graph;
-  lineChart.data.datasets[0].data = data.line;
-  barChart.update();
-  lineChart.update();
+    // --- 5. Reset Function ---
+    function resetDashboard() {
+        tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Select a degree to view data</td></tr>`;
+        selectedCourse.textContent = "—";
+        totalUsers.textContent = "0";
+        barChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0];
+        lineChart.data.datasets[0].data = [0, 0, 0, 0];
+        barChart.update();
+        lineChart.update();
+    }
 });
